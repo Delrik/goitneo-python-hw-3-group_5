@@ -3,7 +3,7 @@ import datetime
 
 
 def is_valid_entry(user) -> bool:
-   return user["name"] and user["birthday"]
+    return user["name"] and user["birthday"]
 
 
 def get_birthdays_per_week(users):
