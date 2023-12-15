@@ -1,41 +1,51 @@
+def input_error(func):
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name and phone please."
+        except KeyError as e:
+            return str(e)
+        except IndexError:
+            return "Invalid number of arguments."
+
+    return inner
+
+
 def parse_input(user_input):
     cmd, *args = user_input.split()
     cmd = cmd.strip().lower()
     return cmd, *args
 
 
+@input_error
 def add_contact(args, contacts):
-    if len(args) != 2:
-        return "Invalid number of arguments."
     name, phone = args
     if name in contacts:
-        return "Contact already exists."
+        raise KeyError("Contact already exists.")
     contacts[name] = phone
     return "Contact added."
 
 
+@input_error
 def change_contact(args, contacts):
-    if len(args) != 2:
-        return "Invalid number of arguments."
     name, phone = args
     if name not in contacts:
-        return "Contact does not exist."
+        raise KeyError("Contact does not exist.")
     contacts[name] = phone
     return "Contact changed."
 
 
+@input_error
 def phone_contact(args, contacts):
-    if len(args) != 1:
-        return "Invalid number of arguments."
     name = args[0]
     if name not in contacts:
-        return "Contact does not exist."
+        raise KeyError("Contact does not exist.")
     return f"{name}: {contacts[name]}"
 
 
+@input_error
 def all_contacts(args, contacts):
-    if len(args) != 0:
-        return "Invalid number of arguments."
     return '\n'.join(f"{name}: {phone}" for name, phone in contacts.items())
 
 
