@@ -46,6 +46,8 @@ def change_contact(args, contacts: AddressBook.AddressBook):
 def phone_contact(args, contacts: AddressBook.AddressBook):
     name = args[0]
     record = contacts.find(name)
+    if not record:
+        return "Contact not found."
     return str(record)
 
 

@@ -91,6 +91,8 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
 
     def find(self, name):
+        if name not in self.data:
+            return None
         return self.data[name]
 
     def delete(self, name):
