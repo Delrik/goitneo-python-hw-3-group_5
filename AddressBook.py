@@ -1,4 +1,6 @@
+import datetime
 from collections import UserDict
+from collections import defaultdict
 from functools import singledispatchmethod
 
 
@@ -25,10 +27,28 @@ class Phone(Field):
         super().__init__(value)
 
 
+class Birthday(Field):
+    def __init__(self, value):
+        if value is not None:
+            try:
+                datetime.datetime.strptime(value, "%d.%m.%Y")
+            except ValueError:
+                raise ValueError("Invalid date.")
+        super().__init__(value)
+
+
 class Record:
     def __init__(self, name):
         self.name = Name(name)
+        self.birthday = Birthday(None)
         self.phones = []
+
+    def add_birthday(self, birthday):
+        if self.birthday.value is not None:
+            raise ValueError("Birthday already exists.")
+        if birthday is None:
+            raise ValueError("Birthday can't be None.")
+        self.birthday = Birthday(birthday)
 
     @singledispatchmethod
     def add_phone(self, phone):
@@ -73,3 +93,25 @@ class AddressBook(UserDict):
 
     def delete(self, name):
         self.data.pop(name)
+
+    def get_birthdays_per_week(self):
+        result = defaultdict(list)
+        current_date = datetime.datetime.now()
+        for user in self.data.values():
+            if not user.birthday.value:
+                continue
+            else:
+                user_birthday = datetime.datetime.strptime(
+                    user.birthday.value, "%d.%m.%Y").date()
+                user_birthday = user_birthday.replace(year=current_date.year)
+                if user_birthday < current_date.date():
+                    user_birthday = user_birthday.replace(
+                        year=current_date.year + 1)
+                if (user_birthday - current_date.date()).days < 7:
+                    date_name = user_birthday.strftime("%A")
+                    if date_name in ["Saturday", "Sunday"] and current_date.strftime("%A") in ["Saturday", "Sunday", "Monday"]:
+                        continue
+                    if date_name in ["Saturday", "Sunday"]:
+                        date_name = "Monday"
+                    result[date_name].append(user.name.value)
+        return result
