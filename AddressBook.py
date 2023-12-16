@@ -33,7 +33,7 @@ class Birthday(Field):
             try:
                 datetime.datetime.strptime(value, "%d.%m.%Y")
             except ValueError:
-                raise ValueError("Invalid date.")
+                raise ValueError("Invalid date format. Should be DD.MM.YYYY")
         super().__init__(value)
 
 
@@ -86,6 +86,8 @@ class AddressBook(UserDict):
         super().__init__()
 
     def add_record(self, record):
+        if record.name.value in self.data:
+            raise ValueError("Name already exists.")
         self.data[record.name.value] = record
 
     def find(self, name):
